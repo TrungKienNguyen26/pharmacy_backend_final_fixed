@@ -19,7 +19,10 @@ public class InvoiceController {
     public List<InvoiceResponse> getAll(@RequestParam(required = false) Long branchId) {
         return service.getAll(branchId);
     }
-
+    @GetMapping("/customer-by-phone")
+    public String findCustomerByPhone(@RequestParam String phone) {
+        return service.findCustomerNameByPhone(phone);
+    }
     // Backward-compatible route for older Flutter builds
     @GetMapping("/branch/{branchId}")
     public List<InvoiceResponse> getByBranch(@PathVariable Long branchId) {

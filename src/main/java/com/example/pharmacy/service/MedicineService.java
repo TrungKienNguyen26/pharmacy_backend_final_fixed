@@ -44,27 +44,44 @@ public class MedicineService {
     }
 
     public MedicineResponse create(MedicineRequest req) {
-        repository.findByCode(req.code()).ifPresent(m -> {
-            throw new BadRequestException("Ma thuoc da ton tai");
-        });
         Category category = categoryService.getById(req.categoryId());
         Branch branch = branchService.getById(req.branchId());
-        Medicine m = Medicine.builder()
-                .code(req.code())
-                .name(req.name())
-                .unit(req.unit())
-                .manufacturer(req.manufacturer())
-                .description(req.description())
-                .expiryDate(req.expiryDate())
-                .quantity(req.quantity())
-                .importPrice(req.importPrice())
-                .salePrice(req.salePrice())
-                .category(category)
-                .branch(branch)
-                .build();
+
+        Medicine m = repository.findByCodeAndBranchId(req.code(), req.branchId())
+                .map(existing -> {
+                    existing.setName(req.name());
+                    existing.setUnit(req.unit());
+                    existing.setManufacturer(req.manufacturer());
+                    existing.setDescription(req.description());
+                    existing.setExpiryDate(req.expiryDate());
+                    existing.setQuantity(existing.getQuantity() + req.quantity());
+                    existing.setImportPrice(req.importPrice());
+                    existing.setSalePrice(req.salePrice());
+                    existing.setCategory(category);
+                    existing.setBranch(branch);
+                    return existing;
+                })
+                .orElseGet(() -> Medicine.builder()
+                        .code(req.code())
+                        .name(req.name())
+                        .unit(req.unit())
+                        .manufacturer(req.manufacturer())
+                        .description(req.description())
+                        .expiryDate(req.expiryDate())
+                        .quantity(req.quantity())
+                        .importPrice(req.importPrice())
+                        .salePrice(req.salePrice())
+                        .category(category)
+                        .branch(branch)
+                        .build());
+
         return toResponse(repository.save(m));
     }
-
+    public MedicineResponse getByCodeAndBranch(String code, Long branchId) {
+        Medicine medicine = repository.findByCodeAndBranchId(code, branchId)
+                .orElseThrow(() -> new NotFoundException("Khong tim thay thuoc voi ma " + code + " trong chi nhanh " + branchId));
+        return toResponse(medicine);
+    }
     public MedicineResponse update(Long id, MedicineRequest req) {
         Medicine m = getEntityById(id);
         m.setCode(req.code());

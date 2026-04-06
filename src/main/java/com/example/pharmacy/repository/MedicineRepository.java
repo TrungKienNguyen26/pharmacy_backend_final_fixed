@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     Optional<Medicine> findByCode(String code);
+    Optional<Medicine> findByCodeAndBranchId(String code, Long branchId);
+
     List<Medicine> findByBranchId(Long branchId);
     List<Medicine> findByBranchIdAndNameContainingIgnoreCase(Long branchId, String keyword);
     List<Medicine> findByNameContainingIgnoreCase(String keyword);

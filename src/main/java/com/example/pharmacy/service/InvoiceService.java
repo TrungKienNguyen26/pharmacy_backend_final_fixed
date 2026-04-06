@@ -39,7 +39,13 @@ public class InvoiceService {
     public Invoice getEntityById(Long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Khong tim thay hoa don id=" + id));
     }
+    public String findCustomerNameByPhone(String phone) {
+        Invoice invoice = repository
+                .findTopByCustomerPhoneOrderByCreatedAtDesc(phone)
+                .orElseThrow(() -> new NotFoundException("Khong tim thay khach hang"));
 
+        return invoice.getCustomerName();
+    }
     @Transactional
     public InvoiceResponse create(CreateInvoiceRequest req) {
         Branch branch = branchService.getById(req.branchId());

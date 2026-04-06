@@ -36,7 +36,13 @@ public class MedicineController {
     public List<MedicineResponse> lowStock(@RequestParam(defaultValue = "10") Integer threshold) {
         return service.getLowStock(threshold);
     }
-
+    @GetMapping("/by-code")
+    public MedicineResponse getByCodeAndBranch(
+            @RequestParam String code,
+            @RequestParam Long branchId
+    ) {
+        return service.getByCodeAndBranch(code, branchId);
+    }
     @GetMapping("/alerts/expiring")
     public List<MedicineResponse> expiring(@RequestParam(defaultValue = "30") Integer days) {
         return service.getExpiring(days);
